@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <title>@gun_trapa — Money Tracker</title>
+  <meta name="theme-color" content="#0b0b10">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div id="auth" class="screen">
+    <div class="auth-card">
+      <div class="logo">@gun_trapa</div>
+      <p class="muted">Личный финансовый трекер</p>
+      <input id="email" type="email" placeholder="Email">
+      <input id="password" type="password" placeholder="Пароль">
+      <button id="loginBtn" class="primary">Войти</button>
+      <button id="signupBtn" class="ghost">Создать аккаунт</button>
+      <p id="authMsg" class="msg"></p>
+    </div>
+  </div>
+
+  <main id="app" class="hidden">
+    <header>
+      <div class="brand">@gun_trapa</div>
+      <button id="logoutBtn" class="icon-btn" title="Выйти">↪</button>
+    </header>
+
+    <section class="hero">
+      <div>
+        <div class="eyebrow">БАЛАНС</div>
+        <div id="balance" class="balance">€0.00</div>
+        <div id="monthLabel" class="muted"></div>
+      </div>
+      <button id="addBtn" class="add">＋</button>
+    </section>
+
+    <section class="cards">
+      <div class="stat"><span>Доходы</span><b id="income">€0.00</b></div>
+      <div class="stat"><span>Расходы</span><b id="expense">€0.00</b></div>
+      <div class="stat"><span>Прогноз</span><b id="forecast">€0.00</b></div>
+    </section>
+
+    <section class="panel">
+      <div class="panel-title"><h2>Ветки</h2><span id="branchCount"></span></div>
+      <div id="branches" class="branches"></div>
+    </section>
+
+    <section class="panel">
+      <div class="panel-title"><h2>Последние записи</h2></div>
+      <div id="transactions" class="transactions"></div>
+    </section>
+
+    <section class="panel ai">
+      <div class="ai-head"><span class="ai-dot">✦</span><div><h2>Анализ</h2><p class="muted">Простой прогноз по твоим данным</p></div></div>
+      <div id="insight">Добавь несколько записей — здесь появится анализ.</div>
+    </section>
+  </main>
+
+  <div id="modal" class="modal hidden">
+    <div class="modal-card">
+      <div class="modal-head"><h2>Новая запись</h2><button id="closeModal" class="icon-btn">×</button></div>
+      <label>Тип</label>
+      <div class="seg"><button data-type="income" class="active">Доход</button><button data-type="expense">Расход</button></div>
+      <label>Сумма (€)</label><input id="amount" inputmode="decimal" placeholder="0.00">
+      <label>Ветка</label><select id="category">
+        <option>Работа</option><option>Подработка</option><option>Продажа</option><option>Подарок</option>
+        <option>Еда</option><option>Транспорт</option><option>Игры</option><option>Покупки</option><option>Другое</option>
+      </select>
+      <label>Комментарий</label><input id="note" placeholder="Например: заработал сегодня">
+      <label>Дата</label><input id="date" type="date">
+      <button id="saveBtn" class="primary">Сохранить</button>
+      <p id="saveMsg" class="msg"></p>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="config.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

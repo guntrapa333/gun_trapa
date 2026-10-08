@@ -1,0 +1,6 @@
+// 1) Create a free project at https://supabase.com
+// 2) Put your Project URL and anon/publishable key below.
+// 3) In Supabase Auth -> URL Configuration, add your deployed site URL.
+// Never put a service_role/secret key here.
+window.SUPABASE_URL = "PASTE_YOUR_SUPABASE_URL";
+window.SUPABASE_ANON_KEY = "PASTE_YOUR_SUPABASE_ANON_KEY";
