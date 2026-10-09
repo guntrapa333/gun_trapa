@@ -1,81 +1,434 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="ru">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-  <title>@gun_trapa — Money Tracker</title>
-  <meta name="theme-color" content="#0b0b10">
-  <link rel="stylesheet" href="style.css">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>@gun_trapa — Личный Трекер</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Plus Jakarta Sans', 'sans-serif'],
+          },
+          colors: {
+            brand: {
+              50: '#f0f9ff',
+              100: '#e0f2fe',
+              500: '#0284c7',
+              600: '#0284c7',
+              700: '#0369a1',
+            }
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    body {
+      background-image: 
+        radial-gradient(at 0% 0%, rgba(56, 189, 248, 0.12) 0px, transparent 50%),
+        radial-gradient(at 100% 0%, rgba(129, 140, 248, 0.15) 0px, transparent 50%),
+        radial-gradient(at 100% 100%, rgba(244, 63, 94, 0.08) 0px, transparent 50%),
+        radial-gradient(at 0% 100%, rgba(16, 185, 129, 0.1) 0px, transparent 50%),
+        linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+      background-attachment: fixed;
+    }
+    .glass-card {
+      background: rgba(255, 255, 255, 0.75);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border: 1px solid rgba(255, 255, 255, 0.8);
+      box-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.04), 0 4px 6px -2px rgba(0, 0, 0, 0.02);
+    }
+    .glass-card-sm {
+      background: rgba(255, 255, 255, 0.65);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      border: 1px solid rgba(255, 255, 255, 0.7);
+    }
+    .hide-scrollbar::-webkit-scrollbar {
+      display: none;
+    }
+    .hide-scrollbar {
+      -ms-overflow-style: none;
+      scrollbar-width: none;
+    }
+  </style>
 </head>
-<body>
-  <div id="auth" class="screen">
-    <div class="auth-card">
-      <div class="logo">@gun_trapa</div>
-      <p class="muted">Личный финансовый трекер</p>
-      <input id="email" type="email" placeholder="Email">
-      <input id="password" type="password" placeholder="Пароль">
-      <button id="loginBtn" class="primary">Войти</button>
-      <button id="signupBtn" class="ghost">Создать аккаунт</button>
-      <p id="authMsg" class="msg"></p>
-    </div>
-  </div>
+<body class="text-slate-800 font-sans min-h-screen pb-24 md:pb-12">
 
-  <main id="app" class="hidden">
-    <header>
-      <div class="brand">@gun_trapa</div>
-      <button id="logoutBtn" class="icon-btn" title="Выйти">↪</button>
-    </header>
-
-    <section class="hero">
-      <div>
-        <div class="eyebrow">БАЛАНС</div>
-        <div id="balance" class="balance">€0.00</div>
-        <div id="monthLabel" class="muted"></div>
+  <header class="sticky top-0 z-30 glass-card border-b border-slate-200/60 mb-6">
+    <div class="max-w-4xl mx-auto px-4 py-3 flex items-center justify-between">
+      <div class="flex items-center space-x-3">
+        <div class="w-10 h-10 rounded-2xl bg-gradient-to-tr from-sky-500 to-indigo-600 flex items-center justify-center text-white font-black text-lg shadow-md shadow-sky-500/20">
+          GT
+        </div>
+        <div>
+          <h1 class="font-bold text-slate-900 text-base leading-tight">@gun_trapa</h1>
+          <p class="text-xs text-slate-500 font-medium">Personal Life & Finance Hub</p>
+        </div>
       </div>
-      <button id="addBtn" class="add">＋</button>
+
+      <div class="flex items-center bg-orange-500/10 border border-orange-500/20 px-3 py-1.5 rounded-full">
+        <span class="text-lg mr-1.5 animate-bounce">🔥</span>
+        <span id="streak-count" class="font-extrabold text-orange-600 text-sm">0</span>
+        <span class="text-xs text-orange-600/80 font-semibold ml-1">дн</span>
+      </div>
+    </div>
+  </header>
+
+  <main class="max-w-4xl mx-auto px-4 space-y-6">
+
+    <section class="grid grid-cols-1 md:grid-cols-3 gap-4">
+      <div class="glass-card p-5 rounded-3xl relative overflow-hidden group">
+        <div class="absolute -right-4 -bottom-4 w-24 h-24 bg-sky-500/10 rounded-full blur-2xl group-hover:bg-sky-500/20 transition-all"></div>
+        <div class="text-xs font-bold uppercase tracking-wider text-slate-400 mb-1">Общий баланс</div>
+        <div id="total-balance" class="text-3xl font-extrabold text-slate-900 tracking-tight">€0.00</div>
+        <div class="mt-3 flex items-center text-xs font-medium text-emerald-600 bg-emerald-50 w-fit px-2.5 py-1 rounded-full border border-emerald-100">
+          <span>↑ Активный учёт</span>
+        </div>
+      </div>
+
+      <div class="glass-card p-5 rounded-3xl flex flex-col justify-between">
+        <div class="flex items-center justify-between mb-2">
+          <span class="text-xs font-bold uppercase tracking-wider text-slate-400">Доходы</span>
+          <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
+        </div>
+        <div id="total-income" class="text-2xl font-bold text-emerald-600">€0.00</div>
+        <div class="text-xs text-slate-400 mt-2">За всё время</div>
+      </div>
+
+      <div class="glass-card p-5 rounded-3xl flex flex-col justify-between">
+        <div class="flex items-center justify-between mb-2">
+          <span class="text-xs font-bold uppercase tracking-wider text-slate-400">Расходы</span>
+          <span class="w-2 h-2 rounded-full bg-rose-500"></span>
+        </div>
+        <div id="total-expense" class="text-2xl font-bold text-rose-500">€0.00</div>
+        <div class="text-xs text-slate-400 mt-2">За всё время</div>
+      </div>
     </section>
 
-    <section class="cards">
-      <div class="stat"><span>Доходы</span><b id="income">€0.00</b></div>
-      <div class="stat"><span>Расходы</span><b id="expense">€0.00</b></div>
-      <div class="stat"><span>Прогноз</span><b id="forecast">€0.00</b></div>
-    </section>
+    <div class="flex space-x-2 border-b border-slate-200/60 pb-2 overflow-x-auto hide-scrollbar">
+      <button onclick="switchTab('finance')" id="tab-btn-finance" class="px-5 py-2.5 rounded-2xl font-bold text-sm transition-all duration-200 bg-slate-900 text-white shadow-sm">
+        💰 Финансы & Ветки
+      </button>
+      <button onclick="switchTab('streak')" id="tab-btn-streak" class="px-5 py-2.5 rounded-2xl font-bold text-sm transition-all duration-200 bg-white/60 text-slate-600 hover:bg-white">
+        🔥 Винстрик & Чекин
+      </button>
+      <button onclick="switchTab('sport')" id="tab-btn-sport" class="px-5 py-2.5 rounded-2xl font-bold text-sm transition-all duration-200 bg-white/60 text-slate-600 hover:bg-white">
+        💪 Спорт & Тренировки
+      </button>
+    </div>
 
-    <section class="panel">
-      <div class="panel-title"><h2>Ветки</h2><span id="branchCount"></span></div>
-      <div id="branches" class="branches"></div>
-    </section>
+    <div id="tab-finance" class="space-y-6">
+      <div class="glass-card p-5 rounded-3xl">
+        <div class="flex items-center justify-between mb-4">
+          <h2 class="font-bold text-slate-900 text-lg">Категории заработка</h2>
+          <button onclick="openModal('transaction')" class="bg-sky-600 hover:bg-sky-700 text-white font-semibold text-xs px-3.5 py-2 rounded-xl transition-all shadow-md shadow-sky-500/20">
+            + Добавить запись
+          </button>
+        </div>
 
-    <section class="panel">
-      <div class="panel-title"><h2>Последние записи</h2></div>
-      <div id="transactions" class="transactions"></div>
-    </section>
+        <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+          <div class="glass-card-sm p-3.5 rounded-2xl border border-sky-100 bg-sky-50/30">
+            <div class="text-xl mb-1">🏦</div>
+            <div class="text-xs font-bold text-slate-500">Банки</div>
+            <div id="cat-banks" class="text-base font-extrabold text-slate-800">€0.00</div>
+          </div>
+          <div class="glass-card-sm p-3.5 rounded-2xl border border-indigo-100 bg-indigo-50/30">
+            <div class="text-xl mb-1">🎯</div>
+            <div class="text-xs font-bold text-slate-500">Задания</div>
+            <div id="cat-tasks" class="text-base font-extrabold text-slate-800">€0.00</div>
+          </div>
+          <div class="glass-card-sm p-3.5 rounded-2xl border border-pink-100 bg-pink-50/30">
+            <div class="text-xl mb-1">🎁</div>
+            <div class="text-xs font-bold text-slate-500">Подарки</div>
+            <div id="cat-gifts" class="text-base font-extrabold text-slate-800">€0.00</div>
+          </div>
+          <div class="glass-card-sm p-3.5 rounded-2xl border border-amber-100 bg-amber-50/30">
+            <div class="text-xl mb-1">💼</div>
+            <div class="text-xs font-bold text-slate-500">Подработка</div>
+            <div id="cat-side" class="text-base font-extrabold text-slate-800">€0.00</div>
+          </div>
+        </div>
+      </div>
 
-    <section class="panel ai">
-      <div class="ai-head"><span class="ai-dot">✦</span><div><h2>Анализ</h2><p class="muted">Простой прогноз по твоим данным</p></div></div>
-      <div id="insight">Добавь несколько записей — здесь появится анализ.</div>
-    </section>
+      <div class="glass-card p-5 rounded-3xl">
+        <h2 class="font-bold text-slate-900 text-lg mb-4">История операций</h2>
+        <div id="transactions-list" class="space-y-2.5">
+        </div>
+      </div>
+    </div>
+
+    <div id="tab-streak" class="hidden space-y-6">
+      <div class="glass-card p-6 rounded-3xl text-center space-y-4">
+        <div class="w-20 h-20 mx-auto rounded-full bg-gradient-to-tr from-amber-400 to-orange-500 flex items-center justify-center text-4xl shadow-lg shadow-orange-500/30">
+          🔥
+        </div>
+        <div>
+          <h2 class="text-2xl font-extrabold text-slate-900">Ежедневный отклик</h2>
+          <p class="text-sm text-slate-500 max-w-sm mx-auto mt-1">Заходи каждый день и отмечайся, чтобы не потушить свой огонёк продуктивности!</p>
+        </div>
+
+        <button id="checkin-btn" onclick="doCheckin()" class="w-full sm:w-auto px-8 py-3.5 rounded-2xl bg-gradient-to-r from-orange-500 to-amber-500 text-white font-bold text-base shadow-lg shadow-orange-500/25 hover:opacity-95 transition-all">
+          Отметиться сегодня (+1 день)
+        </button>
+      </div>
+
+      <div class="glass-card p-5 rounded-3xl">
+        <h3 class="font-bold text-slate-900 text-base mb-3">История активности</h3>
+        <div id="streak-history" class="grid grid-cols-7 gap-2 text-center text-xs">
+        </div>
+      </div>
+    </div>
+
+    <div id="tab-sport" class="hidden space-y-6">
+      <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+        <div class="glass-card p-4 rounded-2xl text-center">
+          <div class="text-2xl mb-1">🤸</div>
+          <div class="text-xs font-semibold text-slate-400">Отжимания</div>
+          <div id="total-pushups" class="text-xl font-extrabold text-slate-800 mt-1">0</div>
+        </div>
+        <div class="glass-card p-4 rounded-2xl text-center">
+          <div class="text-2xl mb-1">🏋️</div>
+          <div class="text-xs font-semibold text-slate-400">Подтягивания</div>
+          <div id="total-pullups" class="text-xl font-extrabold text-slate-800 mt-1">0</div>
+        </div>
+        <div class="glass-card p-4 rounded-2xl text-center">
+          <div class="text-2xl mb-1">⚡</div>
+          <div class="text-xs font-semibold text-slate-400">Пресс</div>
+          <div id="total-abs" class="text-xl font-extrabold text-slate-800 mt-1">0</div>
+        </div>
+        <div class="glass-card p-4 rounded-2xl text-center">
+          <div class="text-2xl mb-1">🏛️</div>
+          <div class="text-xs font-semibold text-slate-400">Зал (тренировки)</div>
+          <div id="total-gym" class="text-xl font-extrabold text-slate-800 mt-1">0</div>
+        </div>
+      </div>
+
+      <div class="glass-card p-5 rounded-3xl">
+        <div class="flex items-center justify-between mb-4">
+          <h2 class="font-bold text-slate-900 text-lg">Записать подход / тренировку</h2>
+        </div>
+        <form onsubmit="addWorkout(event)" class="space-y-3">
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div>
+              <label class="block text-xs font-bold text-slate-500 mb-1">Упражнение</label>
+              <select id="workout-type" class="w-full bg-white/80 border border-slate-200 rounded-xl px-3 py-2.5 text-sm font-semibold focus:outline-none focus:ring-2 focus:ring-sky-500">
+                <option value="pushups">🤸 Отжимания</option>
+                <option value="pullups">🏋️ Подтягивания</option>
+                <option value="abs">⚡ Пресс</option>
+                <option value="gym">🏛️ Спортзал (Сессия)</option>
+              </select>
+            </div>
+            <div>
+              <label class="block text-xs font-bold text-slate-500 mb-1">Количество / Повторения</label>
+              <input type="number" id="workout-count" required placeholder="Например: 25" class="w-full bg-white/80 border border-slate-200 rounded-xl px-3 py-2.5 text-sm font-semibold focus:outline-none focus:ring-2 focus:ring-sky-500">
+            </div>
+          </div>
+          <button type="submit" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-2.5 rounded-xl transition-all text-sm shadow-md shadow-emerald-600/20">
+            Сохранить подход
+          </button>
+        </form>
+      </div>
+
+      <div class="glass-card p-5 rounded-3xl">
+        <h2 class="font-bold text-slate-900 text-lg mb-4">Журнал тренировок</h2>
+        <div id="workouts-list" class="space-y-2">
+        </div>
+      </div>
+    </div>
+
   </main>
 
-  <div id="modal" class="modal hidden">
-    <div class="modal-card">
-      <div class="modal-head"><h2>Новая запись</h2><button id="closeModal" class="icon-btn">×</button></div>
-      <label>Тип</label>
-      <div class="seg"><button data-type="income" class="active">Доход</button><button data-type="expense">Расход</button></div>
-      <label>Сумма (€)</label><input id="amount" inputmode="decimal" placeholder="0.00">
-      <label>Ветка</label><select id="category">
-        <option>Работа</option><option>Подработка</option><option>Продажа</option><option>Подарок</option>
-        <option>Еда</option><option>Транспорт</option><option>Игры</option><option>Покупки</option><option>Другое</option>
-      </select>
-      <label>Комментарий</label><input id="note" placeholder="Например: заработал сегодня">
-      <label>Дата</label><input id="date" type="date">
-      <button id="saveBtn" class="primary">Сохранить</button>
-      <p id="saveMsg" class="msg"></p>
+  <div id="modal-transaction" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-sm hidden">
+    <div class="glass-card bg-white/95 rounded-3xl p-6 w-full max-w-md space-y-4 shadow-2xl">
+      <div class="flex items-center justify-between border-b pb-3 border-slate-100">
+        <h3 class="font-bold text-slate-900 text-lg">Новая транзакция</h3>
+        <button onclick="closeModal('transaction')" class="text-slate-400 hover:text-slate-600 text-xl font-bold">✕</button>
+      </div>
+
+      <form onsubmit="addTransaction(event)" class="space-y-3">
+        <div>
+          <label class="block text-xs font-bold text-slate-500 mb-1">Тип</label>
+          <select id="tx-type" class="w-full bg-white border border-slate-200 rounded-xl px-3 py-2 text-sm font-semibold">
+            <option value="income">➕ Доход</option>
+            <option value="expense">➖ Расход</option>
+          </select>
+        </div>
+
+        <div>
+          <label class="block text-xs font-bold text-slate-500 mb-1">Категория / Ветка</label>
+          <select id="tx-category" class="w-full bg-white border border-slate-200 rounded-xl px-3 py-2 text-sm font-semibold">
+            <option value="banks">🏦 Банки</option>
+            <option value="tasks">🎯 Задания</option>
+            <option value="gifts">🎁 Подарки</option>
+            <option value="side">💼 Подработка</option>
+            <option value="other">📦 Другое</option>
+          </select>
+        </div>
+
+        <div>
+          <label class="block text-xs font-bold text-slate-500 mb-1">Сумма (€)</label>
+          <input type="number" step="0.01" id="tx-amount" required placeholder="0.00" class="w-full bg-white border border-slate-200 rounded-xl px-3 py-2 text-sm font-semibold">
+        </div>
+
+        <div>
+          <label class="block text-xs font-bold text-slate-500 mb-1">Описание / Заметка</label>
+          <input type="text" id="tx-desc" placeholder="Например: Бонус от банка" class="w-full bg-white border border-slate-200 rounded-xl px-3 py-2 text-sm font-semibold">
+        </div>
+
+        <button type="submit" class="w-full bg-sky-600 hover:bg-sky-700 text-white font-bold py-3 rounded-xl transition-all shadow-md shadow-sky-600/20 text-sm">
+          Добавить
+        </button>
+      </form>
     </div>
   </div>
 
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script src="config.js"></script>
-  <script src="app.js"></script>
-</body>
-</html>
+  <script>
+    let state = {
+      transactions: JSON.parse(localStorage.getItem('gt_tx') || '[]'),
+      workouts: JSON.parse(localStorage.getItem('gt_workouts') || '[]'),
+      streak: JSON.parse(localStorage.getItem('gt_streak') || '{"count": 0, "lastCheckin": null, "history": []}')
+    };
+
+    function switchTab(tabName) {
+      ['finance', 'streak', 'sport'].forEach(t => {
+        document.getElementById(`tab-${t}`).classList.add('hidden');
+        const btn = document.getElementById(`tab-btn-${t}`);
+        btn.className = "px-5 py-2.5 rounded-2xl font-bold text-sm transition-all duration-200 bg-white/60 text-slate-600 hover:bg-white";
+      });
+
+      document.getElementById(`tab-${tabName}`).classList.remove('hidden');
+      const activeBtn = document.getElementById(`tab-btn-${tabName}`);
+      activeBtn.className = "px-5 py-2.5 rounded-2xl font-bold text-sm transition-all duration-200 bg-slate-900 text-white shadow-sm";
+    }
+
+    function openModal(id) {
+      document.getElementById(`modal-${id}`).classList.remove('hidden');
+    }
+
+    function closeModal(id) {
+      document.getElementById(`modal-${id}`).classList.add('hidden');
+    }
+
+    function addTransaction(e) {
+      e.preventDefault();
+      const type = document.getElementById('tx-type').value;
+      const category = document.getElementById('tx-category').value;
+      const amount = parseFloat(document.getElementById('tx-amount').value);
+      const desc = document.getElementById('tx-desc').value || 'Без описания';
+
+      const tx = {
+        id: Date.now(),
+        type,
+        category,
+        amount,
+        desc,
+        date: new Date().toLocaleDateString('ru-RU')
+      };
+
+      state.transactions.unshift(tx);
+      localStorage.setItem('gt_tx', JSON.stringify(state.transactions));
+      closeModal('transaction');
+      renderFinance();
+      document.getElementById('tx-amount').value = '';
+      document.getElementById('tx-desc').value = '';
+    }
+
+    function renderFinance() {
+      let income = 0;
+      let expense = 0;
+      let cats = { banks: 0, tasks: 0, gifts: 0, side: 0, other: 0 };
+
+      state.transactions.forEach(t => {
+        if (t.type === 'income') {
+          income += t.amount;
+          if (cats[t.category] !== undefined) cats[t.category] += t.amount;
+        } else {
+          expense += t.amount;
+        }
+      });
+
+      document.getElementById('total-balance').textContent = `€${(income - expense).toFixed(2)}`;
+      document.getElementById('total-income').textContent = `€${income.toFixed(2)}`;
+      document.getElementById('total-expense').textContent = `€${expense.toFixed(2)}`;
+
+      document.getElementById('cat-banks').textContent = `€${cats.banks.toFixed(2)}`;
+      document.getElementById('cat-tasks').textContent = `€${cats.tasks.toFixed(2)}`;
+      document.getElementById('cat-gifts').textContent = `€${cats.gifts.toFixed(2)}`;
+      document.getElementById('cat-side').textContent = `€${cats.side.toFixed(2)}`;
+
+      const list = document.getElementById('transactions-list');
+      if (state.transactions.length === 0) {
+        list.innerHTML = `<div class="text-center text-slate-400 py-6 text-sm">Записей пока нет</div>`;
+        return;
+      }
+
+      list.innerHTML = state.transactions.map(t => `
+        <div class="flex items-center justify-between p-3 rounded-2xl glass-card-sm">
+          <div class="flex items-center space-x-3">
+            <div class="w-9 h-9 rounded-xl flex items-center justify-center font-bold ${t.type === 'income' ? 'bg-emerald-100 text-emerald-600' : 'bg-rose-100 text-rose-600'}">
+              ${t.type === 'income' ? '↓' : '↑'}
+            </div>
+            <div>
+              <div class="text-sm font-bold text-slate-800">${t.desc}</div>
+              <div class="text-xs text-slate-400">${t.date} • ${t.category}</div>
+            </div>
+          </div>
+          <div class="text-sm font-extrabold ${t.type === 'income' ? 'text-emerald-600' : 'text-rose-500'}">
+            ${t.type === 'income' ? '+' : '-'}€${t.amount.toFixed(2)}
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function doCheckin() {
+      const today = new Date().toDateString();
+      if (state.streak.lastCheckin === today) {
+        alert('Ты уже отметился сегодня! Возвращайся завтра.');
+        return;
+      }
+
+      state.streak.count += 1;
+      state.streak.lastCheckin = today;
+      state.streak.history.unshift(today);
+      localStorage.setItem('gt_streak', JSON.stringify(state.streak));
+
+      renderStreak();
+    }
+
+    function renderStreak() {
+      document.getElementById('streak-count').textContent = state.streak.count;
+      const btn = document.getElementById('checkin-btn');
+      const today = new Date().toDateString();
+
+      if (state.streak.lastCheckin === today) {
+        btn.textContent = "Отметка получена! 🔥";
+        btn.className = "w-full sm:w-auto px-8 py-3.5 rounded-2xl bg-slate-200 text-slate-500 font-bold text-base cursor-not-allowed";
+      }
+
+      const hist = document.getElementById('streak-history');
+      hist.innerHTML = state.streak.history.slice(0, 7).map(d => `
+        <div class="p-2.5 rounded-xl bg-orange-50 border border-orange-100 text-orange-600 font-bold">
+          <div>🔥</div>
+          <div class="text-[10px] mt-1 text-slate-400">${d.split(' ')[0]}</div>
+        </div>
+      `).join('');
+    }
+
+    function addWorkout(e) {
+      e.preventDefault();
+      const type = document.getElementById('workout-type').value;
+      const count = parseInt(document.getElementById('workout-count').value);
+
+      const w = {
+        id: Date.now(),
+        type,
+        count,
+        date: new Date().toLocaleDateString
